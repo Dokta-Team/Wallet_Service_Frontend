@@ -5,13 +5,14 @@ import { menus } from "@/utils/MockData";
 import UserAuth from "../custom/UserAuth";
 import { usePathname } from "next/navigation";
 import UserProfile from "../custom/UserProfile";
+import { USER_DATA } from "@/config/config";
 
 const TopNavBar = () => {
   const pathname = usePathname();
   const hidden = pathname === "/signin" || pathname === "/signup";
 
   const userString =
-    typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    typeof window !== "undefined" ? localStorage.getItem(USER_DATA) : null;
   const user = userString ? JSON.parse(userString) : null;
 
   return (

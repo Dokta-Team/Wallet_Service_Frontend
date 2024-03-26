@@ -10,12 +10,18 @@ import {
 import Image from "next/image";
 import CTAButton from "@/components/wallet/CTAButton";
 import { Button } from "../ui/button";
-import { redirect } from "next/navigation";
+import { TOKEN_NAME, USER_DATA } from "@/config/config";
+import { removeCookie } from "@/utils/cookieData";
+import { useRouter } from "next/navigation";
 
 const UserProfile = () => {
+  const router = useRouter();
+
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem(USER_DATA);
+    removeCookie(TOKEN_NAME);
     window.location.reload();
+    router.push("/signin");
   };
   return (
     <Dialog>

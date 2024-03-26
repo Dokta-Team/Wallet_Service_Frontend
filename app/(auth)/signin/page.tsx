@@ -1,128 +1,117 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { redirect } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
-import { BiLoaderAlt } from "react-icons/bi";
-import { useRouter } from "next/router";
+import { ImSpinner2 } from "react-icons/im";
+import { useRouter } from "next/navigation";
+import { loginRequest, postRequest } from "@/utils/apiRequest";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useFormStatus } from "react-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { setToken } from "@/utils/axiosInstance";
 
+interface IUser {
+  full_name: string;
+  email: string;
+  password: string;
+  repeat_password: string;
+}
 const SignIn = () => {
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().required("Password is required"),
-  });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<IUser>();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleLoginUser(data: IUser) {
+    try {
+      const response: any = await loginRequest("user/signup", data);
+      if (response && response?.success === true) {
+        await setToken(response.token);
+        alert(response.message);
+        router.push("/wallet");
+      } else {
+        alert(response.message);
+        toast({
+          variant: "destructive",
+          description: (
+            <div className="w-full flex flex-col">{response?.message}</div>
+          ),
+        });
+      }
+      // localStorage.setItem("user", JSON.stringify(values));
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: (
+          <div className="w-full flex flex-col">{error?.message}</div>
+        ),
+      });
+    }
+  }
+
+  const { pending } = useFormStatus();
+  const { toast } = useToast();
+
+  {
+    pending &&
+      toast({
+        variant: "default",
+        description: (
+          <div className="w-full flex flex-col justify-center items-center gap-3">
+            <p className="text-lg"> Submitting... </p>
+            <ImSpinner2 className="text-[#18283f] animate-spin ml-2" />
+          </div>
+        ),
+      });
+  }
 
   return (
     <div className="w-full h-[100vh] flex justify-center items-center">
       <div className="w-[65%] h-full flex flex-col justify-center items-center relative">
-        <h1 className="uppercase text-4xl font-semibold mb-10"> Sign In</h1>
+        <h1 className="uppercase text-4xl font-semibold mb-10"> Sign In </h1>
         <p className="text-base text-gray-400 text-center w-[40%] mb-10">
           {" "}
           To keep connected with us, kindly sign in with your personal info{" "}
         </p>
-        <Formik
-          initialValues={{
-            email: "",
-            password: "",
-          }}
-          validationSchema={validationSchema}
-          onSubmit={(values, { setSubmitting, setErrors }) => {
-            const storedUser = localStorage.getItem("user");
-            if (!storedUser) {
-              // Handle case when user is not found
-              toast({
-                title: "User not found. Please sign up.",
-                variant: "destructive",
-                description: (
-                  <div className="w-full mt-3 flex justify-center items-center">
-                    {" "}
-                    <BiLoaderAlt className="h-4 w-4 animate-spin" />{" "}
-                  </div>
-                ),
-              });
-              setSubmitting(false);
-              return;
-            }
 
-            const user = JSON.parse(storedUser);
-            if (
-              values.email !== user.email ||
-              values.password !== user.password
-            ) {
-              // Handle case when email or password is invalid
-              setErrors({ password: "Invalid email or password." });
-              setSubmitting(false);
-              return;
-            }
-
-            // Handle successful login
-            setTimeout(() => {
-              console.log("Login successful!");
-              toast({
-                title: "Success",
-                description: "Login successful",
-                variant: "default",
-              });
-              setSubmitting(false);
-              // Redirect user after successful login
-              // Example: router.push('/dashboard');
-            }, 3000);
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form className="w-[50%]">
-              <div className="w-full h-fit flex flex-col gap-3 mb-8">
-                <p> Email Id </p>
-                <Field
-                  type="email"
-                  name="email"
-                  placeholder="johndoe@gmail.com"
-                  className="outline-0 border-b-2 border-[#8797ed]"
-                />
-                <ErrorMessage
-                  name="email"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
-              <div className="w-full h-fit flex flex-col gap-3 mb-10">
-                <p> Password </p>
-                <Field
-                  type="password"
-                  name="password"
-                  placeholder="**********"
-                  className="outline-0 border-b-2 border-[#8797ed]"
-                />
-                <ErrorMessage
-                  name="password"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
-              <div className="w-full flex justify-end mb-10">
-                <p className="font-medium text-sm cursor-pointer">
-                  {" "}
-                  Forgot Your Password?{" "}
-                </p>
-              </div>
-              <div className="w-full flex justify-center items-center">
-                <Button
-                  variant="default"
-                  size="sm"
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-[#8797ed] w-[80%] py-3 rounded-3xl mx-auto hover:bg-transparent hover:text-[#8797ed] hover:border-[#8797ed] hover:border-2"
-                >
-                  {isSubmitting ? "Processing..." : "Sign In"}
-                </Button>
-              </div>
-            </Form>
-          )}
-        </Formik>
+        <form className="w-[50%]" onSubmit={handleSubmit(handleLoginUser)}>
+          <div className="w-full h-fit flex flex-col gap-3 mb-8">
+            <p> Email Id </p>
+            <input
+              type="email"
+              {...register("email", { required: true })}
+              placeholder="johndoe@gmail.com"
+              className="outline-0 border-b-2 border-[#8797ed]"
+            />
+          </div>
+          <div className="w-full h-fit flex flex-col gap-3 mb-10">
+            <p> Password </p>
+            <input
+              type="password"
+              {...register("password", { required: true })}
+              placeholder="**********"
+              className="outline-0 border-b-2 border-[#8797ed]"
+            />
+          </div>
+          <div className="w-full flex justify-center items-center">
+            <Button
+              variant="default"
+              size="sm"
+              type="submit"
+              disabled={pending}
+              aria-disabled={pending}
+              className="bg-[#8797ed] w-[80%] py-3 rounded-3xl mx-auto hover:bg-transparent hover:text-[#8797ed] hover:border-[#8797ed] hover:border-2"
+            >
+              Sign Up
+            </Button>
+          </div>
+        </form>
 
         <Image
           src="/pill.png"
@@ -148,6 +137,7 @@ const SignIn = () => {
           {" "}
           If you don&apos;t have an account yet, sign up. You are welcome
         </p>
+
         <Link href="/signup">
           <Button
             variant="outline"

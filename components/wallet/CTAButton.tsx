@@ -56,64 +56,74 @@ const CTAButton = () => {
   const handleFlutterPayment = useFlutterwave(configFlutter);
 
   return (
-    <Button
-      variant="default"
-      size="sm"
-      className="bg-white text-[#2A3780] hover:bg-gray-200"
-    >
-      <Dialog>
-        <DialogTrigger> Topup Wallet </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogDescription className="flex flex-col items-center justify-center gap-5">
-              <h2 className="text-center font-bold text-xl"> Pay with:</h2>
-              <div className="w-full flex items-center justify-center gap-5">
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="bg-[#2A3780] text-white border-2 border-white hover:bg-gray-200 flex items-center gap-2 py-3"
-                  onClick={() => {
-                    handlePaystackPayment({ onSuccess, onClose });
-                  }}
-                >
-                  <Image
-                    src="/payStack.png"
-                    width={20}
-                    height={20}
-                    alt="PayStack logo"
-                  />
-                  PayStack
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="bg-[#2A3780] text-white border-2 border-white hover:bg-gray-200 flex items-center gap-2 py-3"
-                  onClick={() => {
-                    handleFlutterPayment({
-                      callback: (response) => {
-                        closePaymentModal();
-                        console.log(response);
-                      },
-                      onClose: () => {
-                        closePaymentModal();
-                      },
-                    });
-                  }}
-                >
-                  <Image
-                    src="/flutterWave.png"
-                    width={30}
-                    height={30}
-                    alt="Flutter logo"
-                  />
-                  Flutter Wave
-                </Button>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    </Button>
+    <div className="w-full flex items-center gap-5">
+      <Button
+        variant="default"
+        size="sm"
+        className="bg-white text-[#2A3780] hover:bg-gray-200"
+      >
+        <Dialog>
+          <DialogTrigger> Topup Wallet </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogDescription className="flex flex-col items-center justify-center gap-5">
+                <h2 className="text-center font-bold text-xl"> Pay with:</h2>
+                <div className="w-full flex items-center justify-center gap-5">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-[#2A3780] text-white border-2 border-white hover:bg-gray-200 flex items-center gap-2 py-3"
+                    onClick={() => {
+                      handlePaystackPayment({ onSuccess, onClose });
+                    }}
+                  >
+                    <Image
+                      src="/payStack.png"
+                      width={20}
+                      height={20}
+                      alt="PayStack logo"
+                    />
+                    PayStack
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-[#2A3780] text-white border-2 border-white hover:bg-gray-200 flex items-center gap-2 py-3"
+                    onClick={() => {
+                      handleFlutterPayment({
+                        callback: (response) => {
+                          closePaymentModal();
+                          console.log(response);
+                        },
+                        onClose: () => {
+                          closePaymentModal();
+                        },
+                      });
+                    }}
+                  >
+                    <Image
+                      src="/flutterWave.png"
+                      width={30}
+                      height={30}
+                      alt="Flutter logo"
+                    />
+                    Flutter Wave
+                  </Button>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        className="border border-white bg-transparent text-white hover:bg-gray-200"
+      >
+        {" "}
+        Transfer{" "}
+      </Button>
+    </div>
   );
 };
 export default CTAButton;

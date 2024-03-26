@@ -3,120 +3,134 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { redirect } from "next/navigation";
+import { ImSpinner2 } from "react-icons/im";
+import { useRouter } from "next/navigation";
+import { loginRequest, postRequest } from "@/utils/apiRequest";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useFormStatus } from "react-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { setToken } from "@/utils/axiosInstance";
 
+interface IUser {
+  full_name: string;
+  email: string;
+  password: string;
+  repeat_password: string;
+}
 const SignUp = () => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<IUser>();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const validationSchema = Yup.object().shape({
-    fullName: Yup.string().required("Full Name is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    mobileNumber: Yup.string().required("Mobile Number is required"),
-    password: Yup.string().required("Password is required"),
-  });
+  async function handleLoginUser(data: IUser) {
+    try {
+      const response: any = await loginRequest("user/signup", data);
+      if (response && response?.success === true) {
+        await setToken(response.token);
+        alert(response.message);
+        router.push("/wallet");
+      } else {
+        alert(response.message);
+        toast({
+          variant: "destructive",
+          description: (
+            <div className="w-full flex flex-col">{response?.message}</div>
+          ),
+        });
+      }
+      // localStorage.setItem("user", JSON.stringify(values));
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: (
+          <div className="w-full flex flex-col">{error?.message}</div>
+        ),
+      });
+    }
+  }
+
+  const { pending } = useFormStatus();
+  const { toast } = useToast();
+
+  {
+    pending &&
+      toast({
+        variant: "default",
+        description: (
+          <div className="w-full flex flex-col justify-center items-center gap-3">
+            <p className="text-lg"> Submitting... </p>
+            <ImSpinner2 className="text-[#18283f] animate-spin ml-2" />
+          </div>
+        ),
+      });
+  }
 
   return (
     <div className="w-full h-[100vh] flex justify-center items-center">
       <div className="w-[65%] h-full flex flex-col justify-center items-center relative">
-        <h1 className="uppercase text-4xl font-semibold mb-10"> Sign Up</h1>
+        <h1 className="uppercase text-4xl font-semibold mb-10"> Sign Up </h1>
         <p className="text-base text-gray-400 text-center w-[40%] mb-10">
           {" "}
           To keep connected with us, kindly sign up with your personal info{" "}
         </p>
 
-        <Formik
-          initialValues={{
-            fullName: "",
-            email: "",
-            mobileNumber: "",
-            password: "",
-          }}
-          validationSchema={validationSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            setIsLoading(true); // Set loading state to true
-            localStorage.setItem("user", JSON.stringify(values));
+        <form className="w-[50%]" onSubmit={handleSubmit(handleLoginUser)}>
+          <div className="w-full h-fit flex flex-col gap-3 mb-8">
+            <p> Full Name </p>
+            <input
+              type="text"
+              placeholder="John Doe"
+              className="outline-0 border-b-2 border-[#8797ed]"
+              {...register("full_name", { required: true })}
+            />
+          </div>
+          <div className="w-full h-fit flex flex-col gap-3 mb-8">
+            <p> Email Id </p>
+            <input
+              type="email"
+              {...register("email", { required: true })}
+              placeholder="johndoe@gmail.com"
+              className="outline-0 border-b-2 border-[#8797ed]"
+            />
+          </div>
+          <div className="w-full h-fit flex flex-col gap-3 mb-10">
+            <p> Password </p>
+            <input
+              type="password"
+              {...register("password", { required: true })}
+              placeholder="**********"
+              className="outline-0 border-b-2 border-[#8797ed]"
+            />
+          </div>
+          <div className="w-full h-fit flex flex-col gap-3 mb-10">
+            <p>Confirm Password </p>
+            <input
+              type="password"
+              {...register("repeat_password", { required: true })}
+              placeholder="**********"
+              className="outline-0 border-b-2 border-[#8797ed]"
+            />
+          </div>
+          <div className="w-full flex justify-center items-center">
+            <Button
+              variant="default"
+              size="sm"
+              type="submit"
+              disabled={pending}
+              aria-disabled={pending}
+              className="bg-[#8797ed] w-[80%] py-3 rounded-3xl mx-auto hover:bg-transparent hover:text-[#8797ed] hover:border-[#8797ed] hover:border-2"
+            >
+              Sign Up
+            </Button>
+          </div>
+        </form>
 
-            setTimeout(() => {
-              setIsLoading(false);
-              setSubmitting(false);
-              redirect(`/`);
-            }, 3000);
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form className="w-[50%]">
-              <div className="w-full h-fit flex flex-col gap-3 mb-8">
-                <p> Full Name </p>
-                <Field
-                  type="text"
-                  name="fullName"
-                  placeholder="John Doe"
-                  className="outline-0 border-b-2 border-[#8797ed]"
-                />
-                <ErrorMessage
-                  name="fullName"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
-              <div className="w-full h-fit flex flex-col gap-3 mb-8">
-                <p> Email Id </p>
-                <Field
-                  type="email"
-                  name="email"
-                  placeholder="johndoe@gmail.com"
-                  className="outline-0 border-b-2 border-[#8797ed]"
-                />
-                <ErrorMessage
-                  name="email"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
-              <div className="w-full h-fit flex flex-col gap-3 mb-8">
-                <p> Mobile Number </p>
-                <Field
-                  type="tel"
-                  name="mobileNumber"
-                  placeholder="+234 807..."
-                  className="outline-0 border-b-2 border-[#8797ed]"
-                />
-                <ErrorMessage
-                  name="mobileNumber"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
-              <div className="w-full h-fit flex flex-col gap-3 mb-10">
-                <p> Password </p>
-                <Field
-                  type="password"
-                  name="password"
-                  placeholder="**********"
-                  className="outline-0 border-b-2 border-[#8797ed]"
-                />
-                <ErrorMessage
-                  name="password"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
-              <div className="w-full flex justify-center items-center">
-                <Button
-                  variant="default"
-                  size="sm"
-                  type="submit"
-                  disabled={isSubmitting || isLoading}
-                  className="bg-[#8797ed] w-[80%] py-3 rounded-3xl mx-auto hover:bg-transparent hover:text-[#8797ed] hover:border-[#8797ed] hover:border-2"
-                >
-                  {isLoading ? "Loading..." : "Sign Up"}
-                </Button>
-              </div>
-            </Form>
-          )}
-        </Formik>
         <Image
           src="/pill.png"
           width={250}

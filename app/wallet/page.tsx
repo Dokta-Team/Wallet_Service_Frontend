@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiInformationCircle } from "react-icons/hi";
 import {
   Tooltip,
@@ -10,15 +10,40 @@ import {
 import { table } from "@/utils/MockData";
 import CTAButton from "@/components/wallet/CTAButton";
 import Link from "next/link";
+import { TOKEN_NAME, USER_DATA } from "@/config/config";
+import { getRequest } from "@/utils/apiRequest";
+import { getCookie } from "@/utils/cookieData";
+import { setToken } from "@/utils/axiosInstance";
 
 const Wallet = () => {
+  const [wallet_balance, setwallet_balance] = useState(0.0);
   const [user, setUser] = useState(() => {
     if (typeof window !== "undefined") {
-      const userString = localStorage.getItem("user");
+      const userString = localStorage.getItem(USER_DATA);
       return userString ? JSON.parse(userString) : null;
     }
     return null;
   });
+
+  useEffect(() => {
+    getUserWallet();
+  }, []);
+  async function getUserWallet() {
+    try {
+      const token = await getCookie(TOKEN_NAME);
+      console.log("hdfdf", token);
+      await setToken(token);
+      const response: any = await getRequest("wallet");
+      if (response && response?.success === true) {
+        // set your wallet
+        setwallet_balance(response?.data?.wallet?.balance);
+      } else {
+        alert(response?.message || "Something went wrong");
+      }
+    } catch (error: any) {
+      alert(error.message);
+    }
+  }
 
   return (
     <>
@@ -60,7 +85,7 @@ const Wallet = () => {
         <div className="w-[40%] h-auto p-10 bg-[#2A3780] drop-shadow-lg mb-10 rounded-xl">
           <h2 className="text-4xl font-bold block mb-10 text-white">
             {" "}
-            N 20,000{" "}
+            N{wallet_balance?.toLocaleString()}
           </h2>
           <CTAButton />
         </div>
