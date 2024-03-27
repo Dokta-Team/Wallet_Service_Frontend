@@ -4,6 +4,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 import { siteConfig } from "@/lib/site";
 import TopNavBar from "@/components/layouts/TopNavBar";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig?.url),
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className={inter?.className}>
         <TopNavBar />
         {children}
+        <Toaster />
       </body>
     </html>
   );

@@ -87,7 +87,7 @@ const Wallet = () => {
             {" "}
             N{wallet_balance?.toLocaleString()}
           </h2>
-          <CTAButton />
+          <CTAButton getUserWallet={getUserWallet} />
         </div>
         <div className="w-full h-auto md:h-56 lg:h-56 md:overflow-y-auto lg:overflow-y-auto overflow-x-auto md:overflow-x-hidden lg:overflow-x-hidden">
           <table className="w-full h-full">

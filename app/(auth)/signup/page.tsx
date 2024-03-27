@@ -33,10 +33,19 @@ const SignUp = () => {
       const response: any = await loginRequest("user/signup", data);
       if (response && response?.success === true) {
         await setToken(response.token);
-        alert(response.message);
+        //alert(response.message);
+        toast({
+          variant: "default",
+          description: (
+            <div className="w-full flex flex-col justify-center items-center gap-3">
+              <p className="text-lg"> Welcome!!! </p>
+              <ImSpinner2 className="text-[#18283f] animate-spin ml-2" />
+            </div>
+          ),
+        });
         router.push("/wallet");
       } else {
-        alert(response.message);
+        //alert(response.message);
         toast({
           variant: "destructive",
           description: (
