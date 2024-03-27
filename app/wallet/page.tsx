@@ -59,9 +59,9 @@ const Wallet = () => {
           </p>
         </div>
       )}
-      <div className="w-full h-[100vh] overflow-hidden pt-28 pl-10">
+      <div className="w-full h-[100vh] overflow-y-auto md:overflow-y-hidden lg:overflow-y-hidden pt-28 pl-5 md:pl-10 lg:pl-10 pr-5 md:pr-0 lg:pr-0">
         <div className="flex items-center gap-2 mb-20">
-          <h2 className="text-4xl font-semibold text-[#2A3780] uppercase">
+          <h2 className="text-2xl md:text-4xl lg:text-4xl font-semibold text-[#2A3780] uppercase">
             {" "}
             My Wallet{" "}
           </h2>
@@ -82,14 +82,14 @@ const Wallet = () => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="w-[40%] h-auto p-10 bg-[#2A3780] drop-shadow-lg mb-10 rounded-xl">
+        <div className="w-full md:w-[40%] lg:w-[40%] h-auto p-10 bg-[#2A3780] drop-shadow-lg mb-10 rounded-xl">
           <h2 className="text-4xl font-bold block mb-10 text-white">
             {" "}
             N{wallet_balance?.toLocaleString()}
           </h2>
           <CTAButton />
         </div>
-        <div className="w-full h-56 overflow-y-auto">
+        <div className="w-full h-auto md:h-56 lg:h-56 md:overflow-y-auto lg:overflow-y-auto overflow-x-auto md:overflow-x-hidden lg:overflow-x-hidden">
           <table className="w-full h-full">
             <thead className="w-full">
               <tr className="w-full">

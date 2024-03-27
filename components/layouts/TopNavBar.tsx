@@ -6,6 +6,7 @@ import UserAuth from "../custom/UserAuth";
 import { usePathname } from "next/navigation";
 import UserProfile from "../custom/UserProfile";
 import { USER_DATA } from "@/config/config";
+import { HiOutlineMenuAlt3 } from "react-icons/hi";
 
 const TopNavBar = () => {
   const pathname = usePathname();
@@ -23,7 +24,7 @@ const TopNavBar = () => {
             <Image src="/dokta-logo.png" width={100} height={100} alt="Logo" />
           </Link>
 
-          <div className="w-fit h-fit flex justify-between items-center gap-20">
+          <div className="w-fit h-fit justify-between items-center gap-20 hidden md:flex lg:flex">
             {menus.map((menu, key) => (
               <Link prefetch={false} href={menu?.link} key={key}>
                 <ul className="flex items-center">
@@ -42,7 +43,16 @@ const TopNavBar = () => {
             ))}
           </div>
 
-          {user ? <UserProfile /> : <UserAuth />}
+          <div className="w-fit flex items-center gap-3">
+            {user ? <UserProfile /> : <UserAuth />}
+            <div className="flex md:hidden lg:hidden">
+              <HiOutlineMenuAlt3
+                className={`text-3xl cursor-pointer ${
+                  pathname === "/" ? "text-white" : "text-black"
+                }`}
+              />
+            </div>
+          </div>
         </div>
       )}
     </>

@@ -44,7 +44,6 @@ const SignIn = () => {
           ),
         });
       }
-      // localStorage.setItem("user", JSON.stringify(values));
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -73,14 +72,24 @@ const SignIn = () => {
 
   return (
     <div className="w-full h-[100vh] flex justify-center items-center">
-      <div className="w-[65%] h-full flex flex-col justify-center items-center relative">
+      <div className="w-full md:w-[65%] lg:w-[65%] h-full flex flex-col justify-center items-center relative">
+        <Image
+          src="/dokta-logo.png"
+          width={150}
+          height={150}
+          alt="Logo"
+          className="mb-10 block md:hidden lg:hidden"
+        />
         <h1 className="uppercase text-4xl font-semibold mb-10"> Sign In </h1>
-        <p className="text-base text-gray-400 text-center w-[40%] mb-10">
+        <p className="text-base text-gray-400 text-center w-full md:w-[40%] lg:w-[40%] mb-10 px-10 md:px-0 lg:px-0">
           {" "}
           To keep connected with us, kindly sign in with your personal info{" "}
         </p>
 
-        <form className="w-[50%]" onSubmit={handleSubmit(handleLoginUser)}>
+        <form
+          className="w-full md:w-[50%] lg:w-[50%] px-10 md:px-0 lg:px-0"
+          onSubmit={handleSubmit(handleLoginUser)}
+        >
           <div className="w-full h-fit flex flex-col gap-3 mb-8">
             <p> Email Id </p>
             <input
@@ -99,7 +108,7 @@ const SignIn = () => {
               className="outline-0 border-b-2 border-[#8797ed]"
             />
           </div>
-          <div className="w-full flex justify-center items-center">
+          <div className="w-full flex justify-center items-center mb-5 md:mb-0 lg:mb-0">
             <Button
               variant="default"
               size="sm"
@@ -108,8 +117,15 @@ const SignIn = () => {
               aria-disabled={pending}
               className="bg-[#8797ed] w-[80%] py-3 rounded-3xl mx-auto hover:bg-transparent hover:text-[#8797ed] hover:border-[#8797ed] hover:border-2"
             >
-              Sign Up
+              Sign In
             </Button>
+          </div>
+          <div className="w-full flex md:hidden lg:hidden items-center justify-center gap-2">
+            <p>Don&apos;t have an account yet?</p>
+            <Link href="/signup" prefetch={false} className="text-[#8797ed]">
+              {" "}
+              Sign up{" "}
+            </Link>
           </div>
         </form>
 
@@ -121,7 +137,7 @@ const SignIn = () => {
           className="absolute left-0 bottom-0 opacity-20"
         />
       </div>
-      <div className="w-[35%] h-full flex flex-col justify-center items-center text-white bg-[#8797ed]">
+      <div className="w-full md:w-[35%] lg:w-[35%] h-full flex-col justify-center items-center text-white bg-[#8797ed] hidden md:flex lg:flex">
         <Image
           src="/dokta-logo.png"
           width={150}

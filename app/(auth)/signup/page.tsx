@@ -44,7 +44,6 @@ const SignUp = () => {
           ),
         });
       }
-      // localStorage.setItem("user", JSON.stringify(values));
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -72,15 +71,25 @@ const SignUp = () => {
   }
 
   return (
-    <div className="w-full h-[100vh] flex justify-center items-center">
-      <div className="w-[65%] h-full flex flex-col justify-center items-center relative">
+    <div className="w-full h-[100vh] flex md:justify-center lg:justify-center items-center overflow-y-auto md:overflow-y-hidden lg:overflow-y-hidden">
+      <div className="w-full md:w-[65%] lg:w-[65%] h-full flex flex-col justify-center items-center relative mt-20 md:mt-0 lg:mt-0">
+        <Image
+          src="/dokta-logo.png"
+          width={150}
+          height={150}
+          alt="Logo"
+          className="mb-10 mt-20 block md:hidden lg:hidden"
+        />
         <h1 className="uppercase text-4xl font-semibold mb-10"> Sign Up </h1>
-        <p className="text-base text-gray-400 text-center w-[40%] mb-10">
+        <p className="text-base text-gray-400 text-center w-full md:w-[40%] lg:w-[40%] mb-10 px-10 md:px-0 lg:px-0">
           {" "}
           To keep connected with us, kindly sign up with your personal info{" "}
         </p>
 
-        <form className="w-[50%]" onSubmit={handleSubmit(handleLoginUser)}>
+        <form
+          className="w-full md:w-[50%] lg:w-[50%] px-10 md:px-0 lg:px-0"
+          onSubmit={handleSubmit(handleLoginUser)}
+        >
           <div className="w-full h-fit flex flex-col gap-3 mb-8">
             <p> Full Name </p>
             <input
@@ -117,7 +126,7 @@ const SignUp = () => {
               className="outline-0 border-b-2 border-[#8797ed]"
             />
           </div>
-          <div className="w-full flex justify-center items-center">
+          <div className="w-full flex justify-center items-center mb-5 md:mb-0 lg:mb-0">
             <Button
               variant="default"
               size="sm"
@@ -129,6 +138,13 @@ const SignUp = () => {
               Sign Up
             </Button>
           </div>
+          <div className="w-full flex md:hidden lg:hidden items-center justify-center gap-2 mb-10">
+            <p>Already have an account?</p>
+            <Link href="/signin" prefetch={false} className="text-[#8797ed]">
+              {" "}
+              Sign in{" "}
+            </Link>
+          </div>
         </form>
 
         <Image
@@ -139,13 +155,13 @@ const SignUp = () => {
           className="absolute left-0 bottom-0 opacity-20"
         />
       </div>
-      <div className="w-[35%] h-full flex flex-col justify-center items-center text-white bg-[#8797ed]">
+      <div className="w-full md:w-[35%] lg:w-[35%] h-full flex-col justify-center items-center text-white bg-[#8797ed] hidden md:flex lg:flex">
         <Image
           src="/dokta-logo.png"
           width={150}
           height={150}
           alt="Logo"
-          className="mb-36"
+          className="md:mb-36 lg:mb-36"
         />
         <h1 className="text-4xl mb-8 font-medium relative before:absolute before:w-[20%] before:h-[3px] before:bg-white before:bottom-[-40%] before:left-1/2 before:translate-x-[-50%] before:translate-y-[-50%]">
           {" "}
