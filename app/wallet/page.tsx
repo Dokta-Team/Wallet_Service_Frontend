@@ -85,9 +85,12 @@ const Wallet = () => {
         <div className="w-full md:w-[40%] lg:w-[40%] h-auto p-10 bg-[#2A3780] drop-shadow-lg mb-10 rounded-xl">
           <h2 className="text-4xl font-bold block mb-10 text-white">
             {" "}
-            N{wallet_balance?.toLocaleString()}
+            &#8358;{wallet_balance?.toLocaleString()}
           </h2>
-          <CTAButton getUserWallet={getUserWallet} />
+          <CTAButton
+            getUserWallet={getUserWallet}
+            walletBalance={wallet_balance}
+          />
         </div>
         <div className="w-full h-auto md:h-56 lg:h-56 md:overflow-y-auto lg:overflow-y-auto overflow-x-auto md:overflow-x-hidden lg:overflow-x-hidden">
           <table className="w-full h-full">

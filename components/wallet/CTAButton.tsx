@@ -1,10 +1,10 @@
 "use client";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { usePaystackPayment } from "react-paystack";
@@ -12,8 +12,10 @@ import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
 import Image from "next/image";
 import { postRequest } from "@/utils/apiRequest";
 import { USER_DATA } from "@/config/config";
-import { useState } from "react";
 import { setToken } from "@/utils/axiosInstance";
+import { toast } from "@/components/ui/use-toast";
+import { BiLoaderAlt } from "react-icons/bi";
+import { HiInformationCircle } from "react-icons/hi";
 
 interface IPayment {
   amount: number;
@@ -22,11 +24,12 @@ interface IPayment {
 
 interface PropTypes {
   getUserWallet: () => void;
+  walletBalance: number;
 }
 const CTAButton = (props: PropTypes) => {
   const { getUserWallet } = props;
-  const [isLoading, setIsLoading] = useState(false);
-  const [amount, setamount] = useState("2000");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [amount, setAmount] = useState<string>("");
   const userString =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userString ? JSON.parse(userString) : null;
@@ -37,7 +40,7 @@ const CTAButton = (props: PropTypes) => {
     // reference: new Date().getTime().toString(),
     reference: "ly4wv0tzji",
     email: "string@gmail.com",
-    amount: 2000000,
+    amount: parseInt(amount),
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_KEY as string,
   };
 
@@ -46,7 +49,7 @@ const CTAButton = (props: PropTypes) => {
   };
 
   const makePayment = async (reference: any) => {
-    console.log("makePayment", reference);
+    //console.log("makePayment", reference);
     try {
       setToken();
       const paymentData = {
@@ -63,89 +66,89 @@ const CTAButton = (props: PropTypes) => {
         total: 1.5,
       };
 
-      setIsLoading(true);
+      //setIsLoading(true);
       const response: any = await postRequest(
         "transfer/wallet/topup",
         paymentData
       );
       if (response && response?.success === true) {
-        alert(response.message);
+        toast({
+          variant: "copied",
+          description: (
+            <div className="w-full flex justify-center items-center">
+              {response.message}
+            </div>
+          ),
+        });
         getUserWallet();
-        // console.log("Payment respnse", response.data);
-        // configPayStack.amount = response.data.amount;
-        // configPayStack.email = response.data.email;
-        // configPayStack.reference = response.data.reference;
-        // handlePaystackPayment({ onSuccess, onClose });
-        // //alert(response.message);
-        // toast({
-        //   variant: "default",
-        //   description: (
-        //     <div className="w-full flex flex-col justify-center items-center gap-3">
-        //       <p className="text-lg"> Welcome!!! </p>
-        //       <ImSpinner2 className="text-[#18283f] animate-spin ml-2" />
-        //     </div>
-        //   ),
-        // });
-        // setIsLoading(false);
-        // router.push("/wallet");
+        //console.log("response - ", response);
+
+        setIsLoading(false);
       } else {
-        alert(response.message);
-        //alert(response.message);
-        // toast({
-        //   variant: "destructive",
-        //   description: (
-        //     <div className="w-full flex flex-col">{response?.message}</div>
-        //   ),
-        // });
-        // setIsLoading(false);
+        toast({
+          variant: "copied",
+          description: (
+            <div className="w-full flex justify-center items-center">
+              {response.message}
+            </div>
+          ),
+        });
+
+        setIsLoading(false);
       }
     } catch (error: any) {
-      alert(error.message);
+      toast({
+        variant: "destructive",
+        description: (
+          <div className="w-full flex justify-center items-center">
+            {error.message}
+          </div>
+        ),
+      });
       console.log("error", error);
-      // toast({
-      //   variant: "destructive",
-      //   description: (
-      //     <div className="w-full flex flex-col">{error?.message}</div>
-      //   ),
-      // });
-      // setIsLoading(false);
+      setIsLoading(false);
     }
   };
   const onClose = () => {
+    toast({
+      variant: "destructive",
+      description: (
+        <div className="w-full flex justify-center items-center">
+          Payment is not successfull
+        </div>
+      ),
+    });
     console.log("Payment is not successfull");
     console.log("closed");
   };
 
-  const checkInputAmount = async () => {
-    if (!amount) {
-      alert("Amount is empty");
-      return false;
+  //const walletBalance = props.walletBalance;
+
+  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    if (!/^\d*\.?\d*$/.test(value)) {
+      setAmount("");
+      return;
     }
-    if (parseInt(amount) < 1000) {
-      alert("Input amount is less than 1000");
-      return false;
-    } else {
-      return true;
-    }
+    setAmount(value);
+    //console.log(amount);
   };
 
   async function handleLoginUser(data: IPayment) {
     try {
       await setToken();
-      const amountValue = await checkInputAmount();
-      if (amountValue === false) {
-        return;
-      }
+
       let userData: any = localStorage.getItem(USER_DATA);
       userData = userData ? JSON.parse(userData) : null;
-      console.log("userData", userData?.email);
+      //console.log("userData", userData?.email);
       setIsLoading(true);
       const response: any = await postRequest("transfer/payment/link", {
-        amount: 2000,
+        amount: amount,
         type: "paystack",
       });
       if (response && response?.success === true) {
-        console.log("Payment respnse", response.data);
+        //console.log("Payment respnse", response.data);
         configPayStack.amount = response.data.amount;
         configPayStack.email = response.data.email;
         configPayStack.reference = response.data.reference;
@@ -163,6 +166,7 @@ const CTAButton = (props: PropTypes) => {
       // setIsLoading(false);
     }
   }
+
   const handlePaystackPayment = usePaystackPayment(configPayStack);
 
   /********* Flutterwave Config *********/
@@ -187,67 +191,147 @@ const CTAButton = (props: PropTypes) => {
 
   const handleFlutterPayment = useFlutterwave(configFlutter);
 
+  const resetAmountInput = () => {
+    setAmount("");
+  };
+
+  {
+    isLoading &&
+      toast({
+        title: "Syncing ...",
+        variant: "copied",
+        description: (
+          <div className="w-full mt-3 flex justify-center items-center">
+            {" "}
+            <BiLoaderAlt className="mr-2 h-4 w-4 animate-spin" />{" "}
+          </div>
+        ),
+      });
+  }
+
   return (
     <div className="w-full flex items-center gap-5">
-      <Button
-        variant="default"
-        size="sm"
-        className="bg-white text-[#2A3780] hover:bg-gray-200"
-      >
-        <Dialog>
-          <DialogTrigger> Topup Wallet </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogDescription className="flex flex-col items-center justify-center gap-5">
+      <Dialog>
+        <DialogTrigger>
+          {" "}
+          <Button
+            variant="default"
+            size="sm"
+            className="bg-white text-[#2A3780] hover:bg-gray-200"
+          >
+            {" "}
+            Topup Wallet{" "}
+          </Button>{" "}
+        </DialogTrigger>
+        <DialogContent className="w-full flex flex-col items-center justify-center gap-5">
+          <div className="w-full flex flex-col gap-2">
+            <div className="w-full flex items-center mt-5">
+              <Button
+                variant="default"
+                size="sm"
+                className="w-1/5 rounded-l-lg rounded-r-none bg-[#2A3780] text-white"
+              >
+                &#8358;
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-2 border-[#2A3780] rounded-l-none w-full"
+              >
+                <input
+                  type="text"
+                  placeholder="Input Amount"
+                  className="rounded-r-lg w-full outline-0 text-gray-500 bg-transparent"
+                  inputMode="numeric"
+                  value={amount}
+                  onChange={handleAmountChange}
+                  required
+                />
+              </Button>
+            </div>
+            <div className="w-full flex items-center gap-2">
+              <HiInformationCircle className="text-base text-[#2A3780]" />
+              <p className="text-[9px] md:text-xs lg:text-xs text-gray-500 justify-start">
+                Kindly note that amount lower than{" "}
+                <span className="font-bold"> &#8358;1,000 </span> won&apos;t be
+                processed
+              </p>
+            </div>
+          </div>
+          <div className="w-full">
+            <Dialog>
+              <DialogTrigger asChild className="w-full">
+                <Button
+                  variant="default"
+                  size="sm"
+                  type="button"
+                  className="w-full text-white bg-[#2A3780] hover:border-none"
+                  disabled={amount === "" || parseInt(amount) < 1000}
+                >
+                  {" "}
+                  Next{" "}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="flex flex-col items-center justify-center gap-5">
                 <h2 className="text-center font-bold text-xl"> Pay with:</h2>
+
                 <div className="w-full flex items-center justify-center gap-5">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="bg-[#2A3780] text-white border-2 border-white hover:bg-gray-200 flex items-center gap-2 py-3"
-                    onClick={() => {
-                      handleLoginUser({ amount: 2000, type: "paystack" });
-                      // handlePaystackPayment({ onSuccess, onClose });
-                    }}
-                  >
-                    <Image
-                      src="/payStack.png"
-                      width={20}
-                      height={20}
-                      alt="PayStack logo"
-                    />
-                    PayStack
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="bg-[#2A3780] text-white border-2 border-white hover:bg-gray-200 flex items-center gap-2 py-3"
-                    onClick={() => {
-                      handleFlutterPayment({
-                        callback: (response) => {
-                          closePaymentModal();
-                          console.log(response);
-                        },
-                        onClose: () => {
-                          closePaymentModal();
-                        },
-                      });
-                    }}
-                  >
-                    <Image
-                      src="/flutterWave.png"
-                      width={30}
-                      height={30}
-                      alt="Flutter logo"
-                    />
-                    Flutter Wave
-                  </Button>
+                  <DialogClose className="w-auto">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="bg-[#2A3780] text-white border-2 border-white hover:bg-gray-200 flex items-center gap-2 py-3"
+                      onClick={() => {
+                        handleLoginUser({
+                          amount: parseInt(amount),
+                          type: "paystack",
+                        });
+                        resetAmountInput();
+                        // handlePaystackPayment({ onSuccess, onClose });
+                      }}
+                    >
+                      <Image
+                        src="/payStack.png"
+                        width={20}
+                        height={20}
+                        alt="PayStack logo"
+                      />
+                      PayStack
+                    </Button>
+                  </DialogClose>
+
+                  <DialogClose className="w-auto">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="bg-[#2A3780] text-white border-2 border-white hover:bg-gray-200 flex items-center gap-2 py-3"
+                      onClick={() => {
+                        handleFlutterPayment({
+                          callback: (response) => {
+                            closePaymentModal();
+                            console.log(response);
+                          },
+                          onClose: () => {
+                            closePaymentModal();
+                          },
+                        });
+                      }}
+                    >
+                      <Image
+                        src="/flutterWave.png"
+                        width={30}
+                        height={30}
+                        alt="Flutter logo"
+                      />
+                      Flutter Wave
+                    </Button>
+                  </DialogClose>
                 </div>
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
-      </Button>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Button
         variant="outline"
         size="sm"
