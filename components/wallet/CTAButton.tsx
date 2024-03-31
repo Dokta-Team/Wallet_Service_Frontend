@@ -23,13 +23,13 @@ interface IPayment {
 }
 
 interface PropTypes {
-  getUserWallet: () => void;
-  walletBalance: number;
+  handleTopUp: () => void;
 }
 const CTAButton = (props: PropTypes) => {
-  const { getUserWallet } = props;
+  const { handleTopUp } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
+
   const userString =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userString ? JSON.parse(userString) : null;
@@ -80,9 +80,7 @@ const CTAButton = (props: PropTypes) => {
             </div>
           ),
         });
-        getUserWallet();
-        //console.log("response - ", response);
-
+        props.handleTopUp();
         setIsLoading(false);
       } else {
         toast({
@@ -93,7 +91,6 @@ const CTAButton = (props: PropTypes) => {
             </div>
           ),
         });
-
         setIsLoading(false);
       }
     } catch (error: any) {
@@ -144,7 +141,7 @@ const CTAButton = (props: PropTypes) => {
       //console.log("userData", userData?.email);
       setIsLoading(true);
       const response: any = await postRequest("transfer/payment/link", {
-        amount: amount,
+        amount: parseInt(amount),
         type: "paystack",
       });
       if (response && response?.success === true) {

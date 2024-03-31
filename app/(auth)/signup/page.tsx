@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { loginRequest, postRequest } from "@/utils/apiRequest";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useFormStatus } from "react-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { setToken } from "@/utils/axiosInstance";
 
 interface IUser {
@@ -63,11 +63,8 @@ const SignUp = () => {
     }
   }
 
-  const { pending } = useFormStatus();
-  const { toast } = useToast();
-
   {
-    pending &&
+    isLoading &&
       toast({
         variant: "default",
         description: (
@@ -140,8 +137,8 @@ const SignUp = () => {
               variant="default"
               size="sm"
               type="submit"
-              disabled={pending}
-              aria-disabled={pending}
+              disabled={isLoading}
+              aria-disabled={isLoading}
               className="bg-[#8797ed] w-[80%] py-3 rounded-3xl mx-auto hover:bg-transparent hover:text-[#8797ed] hover:border-[#8797ed] hover:border-2"
             >
               Sign Up

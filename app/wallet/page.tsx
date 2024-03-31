@@ -10,13 +10,13 @@ import {
 import { table } from "@/utils/MockData";
 import CTAButton from "@/components/wallet/CTAButton";
 import Link from "next/link";
-import { TOKEN_NAME, USER_DATA } from "@/config/config";
-import { getRequest } from "@/utils/apiRequest";
-import { getCookie } from "@/utils/cookieData";
-import { setToken } from "@/utils/axiosInstance";
+import { USER_DATA } from "@/config/config";
+import { getUserWallet } from "@/utils/getWalletData";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Wallet = () => {
-  const [wallet_balance, setwallet_balance] = useState(0.0);
+  const [wallet_balance, setwallet_balance] = useState<number>(0.0);
+
   const [user, setUser] = useState(() => {
     if (typeof window !== "undefined") {
       const userString = localStorage.getItem(USER_DATA);
@@ -26,24 +26,25 @@ const Wallet = () => {
   });
 
   useEffect(() => {
-    getUserWallet();
+    fetchWalletBalance();
   }, []);
-  async function getUserWallet() {
+
+  const fetchWalletBalance = async () => {
     try {
-      const token = await getCookie(TOKEN_NAME);
-      console.log("hdfdf", token);
-      await setToken(token);
-      const response: any = await getRequest("wallet");
-      if (response && response?.success === true) {
-        // set your wallet
-        setwallet_balance(response?.data?.wallet?.balance);
-      } else {
-        alert(response?.message || "Something went wrong");
-      }
-    } catch (error: any) {
-      alert(error.message);
+      const balance = await getUserWallet();
+      setwallet_balance(balance);
+    } catch (error) {
+      console.error(error);
     }
-  }
+  };
+
+  const handleTopUp = async () => {
+    try {
+      await fetchWalletBalance();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -83,14 +84,16 @@ const Wallet = () => {
           </TooltipProvider>
         </div>
         <div className="w-full md:w-[40%] lg:w-[40%] h-auto p-10 bg-[#2A3780] drop-shadow-lg mb-10 rounded-xl">
-          <h2 className="text-4xl font-bold block mb-10 text-white">
+          <h2 className="text-4xl font-bold flex items-center mb-10 text-white">
             {" "}
-            &#8358;{wallet_balance?.toLocaleString()}
+            &#8358;
+            {wallet_balance === undefined || wallet_balance === null ? (
+              <Skeleton className="h-10 w-40 bg-[#010413] rounded-lg shadow ml-3" />
+            ) : (
+              <>{wallet_balance?.toLocaleString()}</>
+            )}
           </h2>
-          <CTAButton
-            getUserWallet={getUserWallet}
-            walletBalance={wallet_balance}
-          />
+          <CTAButton handleTopUp={handleTopUp} />
         </div>
         <div className="w-full h-auto md:h-56 lg:h-56 md:overflow-y-auto lg:overflow-y-auto overflow-x-auto md:overflow-x-hidden lg:overflow-x-hidden">
           <table className="w-full h-full">

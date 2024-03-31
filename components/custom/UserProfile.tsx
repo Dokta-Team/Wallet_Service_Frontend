@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogClose,
@@ -13,6 +14,8 @@ import { Button } from "../ui/button";
 import { TOKEN_NAME, USER_DATA } from "@/config/config";
 import { removeCookie } from "@/utils/cookieData";
 import { useRouter } from "next/navigation";
+import { getUserWallet } from "@/utils/getWalletData";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const UserProfile = () => {
   const router = useRouter();
@@ -23,6 +26,20 @@ const UserProfile = () => {
     window.location.reload();
     router.push("/signin");
   };
+  const [wallet_balance, setwallet_balance] = useState(0.0);
+
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      try {
+        const balance = await getUserWallet();
+        setwallet_balance(balance);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchWalletBalance();
+  }, []);
+
   return (
     <Dialog>
       <DialogTrigger>
@@ -41,15 +58,19 @@ const UserProfile = () => {
               <span className="text-base text-gray-500"> Wallet Balance: </span>
               <span className="text-3xl font-semibold text-white">
                 {" "}
-                N20,000{" "}
+                &#8358;
+                {wallet_balance === undefined || wallet_balance === null ? (
+                  <Skeleton className="h-10 w-40 bg-[#010413] rounded-lg shadow ml-3" />
+                ) : (
+                  <>{wallet_balance?.toLocaleString()}</>
+                )}
               </span>
             </div>
-            <CTAButton />
             <DialogClose className="w-full">
               <Button
                 variant="default"
                 size="sm"
-                className="w-full py-3 bg-transparent mt-10"
+                className="w-full py-3 bg-white mt-10 text-[2A3780] hover:text-white"
                 onClick={handleLogout}
               >
                 {" "}
